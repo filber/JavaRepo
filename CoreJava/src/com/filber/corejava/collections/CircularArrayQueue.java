@@ -51,7 +51,7 @@ public class CircularArrayQueue<E> implements Queue{
 
     @Override
     public boolean addAll(Collection c) {
-        return false;
+        return true;
     }
 
     @Override
