@@ -1,5 +1,8 @@
 package com.filber.refactor._1_method;
 
+/**
+ * 以查询取代临时变量
+ */
 public class _04_ReplaceTempWithQuery_145 {
 	int _quantity;
 	int _itemPrice;
@@ -18,7 +21,9 @@ public class _04_ReplaceTempWithQuery_145 {
 	private int basePrice(){
 		return _quantity*_itemPrice;
 	}
-	private double discountFactor(){
+	//Extractc出discountFactor函数
+    private double discountFactor(){
+        //用basePrice()作为Query取代原先的临时变量.
 		if (basePrice()>1000) {
 			return 0.95;
 		} else {
