@@ -2,6 +2,7 @@ package com.filber.refactor._6_hierarchy;
 
 public class _68_ReplaceDelegationWithInheritance_380 {
 
+    //Test Conflict.
     //Second Test Conflict.
 
     class Person{
