@@ -73,6 +73,16 @@ public class _23_DuplicateObservedData_214 {
         TextField _endField;
         TextField _lengthField;
 
+        public ObserverIntervalWindow() throws HeadlessException {
+            fieldObservable = new FieldObservable(_startField,_endField,_lengthField);
+            StartFieldObserver startFieldObserver = new StartFieldObserver(_startField);
+            fieldObservable.addObserver(startFieldObserver);
+            EndFieldObserver endFieldObserver = new EndFieldObserver(_endField);
+            fieldObservable.addObserver(endFieldObserver);
+            LengthFieldObserver lengthFieldObserver = new LengthFieldObserver(_lengthField);
+            fieldObservable.addObserver(lengthFieldObserver);
+        }
+
         static class FieldObservable extends  Observable{
             final TextField _startField;
             final TextField _endField;
@@ -100,16 +110,6 @@ public class _23_DuplicateObservedData_214 {
             public int getLength() {
                 return Integer.parseInt(_lengthField.getText());
             }
-        }
-
-        public ObserverIntervalWindow() throws HeadlessException {
-            fieldObservable = new FieldObservable(_startField,_endField,_lengthField);
-            StartFieldObserver startFieldObserver = new StartFieldObserver(_startField);
-            fieldObservable.addObserver(startFieldObserver);
-            EndFieldObserver endFieldObserver = new EndFieldObserver(_endField);
-            fieldObservable.addObserver(endFieldObserver);
-            LengthFieldObserver lengthFieldObserver = new LengthFieldObserver(_lengthField);
-            fieldObservable.addObserver(lengthFieldObserver);
         }
 
         static class StartFieldObserver implements Observer{
