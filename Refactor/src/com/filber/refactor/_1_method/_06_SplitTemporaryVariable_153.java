@@ -1,14 +1,16 @@
 package com.filber.refactor._1_method;
 
-//第一个力先作用,一段时间之后,第二个力开始作用(两个力同时作用)
+/**
+ * 分解临时变量
+ */
 public class _06_SplitTemporaryVariable_153 {
+    //场景:第一个力先作用,一段时间之后,第二个力开始作用(两个力同时作用)
 	double _primaryForce;
 	double _mass;
 	double _secondaryForce;
-	//第一个力发生到第二个力发生之间的时间间隔
+    // 第一个力发生到第二个力发生之间的时间间隔
 	int _delay;
 	
-	//time为总时间
 	double badGetDistanceTravelled(int time) {
 		double result;
 		double acc=_primaryForce/_mass;
@@ -49,9 +51,7 @@ public class _06_SplitTemporaryVariable_153 {
 		return initVel*time + 0.5*acc*time*time;
 	}
 	double secondGoodGetDistanceTravelled(int time) {
-		double result = 0.0;
-		result += getDistanceOnce(0, Math.min(time, _delay), _primaryForce,_mass);
-		
+		double result = getDistanceOnce(0, Math.min(time, _delay), _primaryForce,_mass);
 		int secondaryTime = time - _delay;
 		if (secondaryTime > 0) {
 			double primaryVel = (_primaryForce/_mass)*_delay;
