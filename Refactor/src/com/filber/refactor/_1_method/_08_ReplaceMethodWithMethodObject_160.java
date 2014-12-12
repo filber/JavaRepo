@@ -1,5 +1,8 @@
 package com.filber.refactor._1_method;
 
+/**
+ * 以函数对象取代函数.
+ */
 public class _08_ReplaceMethodWithMethodObject_160 {
 	
 	int delta(){
