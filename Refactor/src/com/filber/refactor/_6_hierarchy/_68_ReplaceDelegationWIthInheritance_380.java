@@ -1,6 +1,6 @@
 package com.filber.refactor._6_hierarchy;
 
-public class _68_ReplaceDelegationWIthInheritance_380 {
+public class _68_ReplaceDelegationWithInheritance_380 {
 
     class Person{
         private String name;
