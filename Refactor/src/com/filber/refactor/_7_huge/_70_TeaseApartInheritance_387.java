@@ -1,6 +1,6 @@
 package com.filber.refactor._7_huge;
 
-public class _68_TeaseApartInheritance_387 {
+public class _70_TeaseApartInheritance_387 {
 
     class BadCase{
         class Deal{}
