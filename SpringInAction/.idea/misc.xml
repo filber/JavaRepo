@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/knights/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/messaging/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol/pom.xml" />
+        <option value="$PROJECT_DIR$/rest-client/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-aop/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-aspectj/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-atinject/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-annotation/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-javaconfig/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-qualifiers/pom.xml" />
+        <option value="$PROJECT_DIR$/springidol-autodiscovery/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
+
