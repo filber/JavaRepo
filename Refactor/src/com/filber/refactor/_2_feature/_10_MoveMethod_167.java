@@ -11,7 +11,7 @@ public class _10_MoveMethod_167 {
             int _daysOverdrawn;
 
             //逻辑层面来说,overdraftCharge计算方式与具体的账户无关,与AccountType的关联更紧密.
-            double overdraftCharge() {
+            public double overdraftCharge() {
                 if (_type.isPremium()) {
                     double result = 10;
                     if (_daysOverdrawn>7) {
@@ -22,7 +22,7 @@ public class _10_MoveMethod_167 {
                     return _daysOverdrawn*1.75;
                 }
             }
-            double bankCharge(){
+            public double bankCharge(){
                 double result = 4.5;
                 if (_daysOverdrawn>0) {
                     result += overdraftCharge();
@@ -31,7 +31,7 @@ public class _10_MoveMethod_167 {
             }
         }
         class AccountType {
-            boolean isPremium(){
+            public boolean isPremium(){
                 return false;
             }
         }
@@ -43,20 +43,19 @@ public class _10_MoveMethod_167 {
             AccountType _type;
             int _daysOverdrawn;
 
-            double bankCharge() {
-                //消除了临时变量result
-                return 4.5 + _type.overdraftCharge(_daysOverdrawn);
+            public double bankCharge() {
+                return 4.5 + _type.overdraftCharge(_daysOverdrawn);//消除了临时变量result
             }
         }
         class AccountType {
-            boolean isPremium(){
+            //降低isPremium的访问级别为private,因为重构之后它已不被Account访问.
+            private boolean isPremium(){
                 return false;
             }
             //搬移overdraftCharge至AccountType,并接收daysOverdrawn作为参数.
-            double overdraftCharge(int daysOverdrawn) {
+            public double overdraftCharge(int daysOverdrawn) {
                 if (daysOverdrawn<=0) return 0;//从Client中挪进来的逻辑.
-                //将表达式的条件翻转,从而易于使用Guard Clauses
-                if (!isPremium()) return daysOverdrawn*1.75;
+                if (!isPremium()) return daysOverdrawn*1.75;//将表达式的条件翻转,消除嵌套IF.
                 if (daysOverdrawn>7) return  10+(daysOverdrawn-7)*0.85;
                 return 10;
             }
