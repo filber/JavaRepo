@@ -1,35 +1,37 @@
 package com.filber.refactor._2_feature;
 
-
+/**
+ * 搬移字段
+ */
 public class _11_MoveField_171 {
-	class BadAccount{
-		BadAccountType _type;
-		//语义层面来说,_interestRate与AccountType的关联更紧密.
-		double _interestRate;
-		double interestForAmountDays(double amount,int days) {
-			return _interestRate*amount*days/365;
-		}
-	}
-	class BadAccountType{
-	}
-	
-	class GoodAccount{
-		GoodAccountType _type;
-		double interestForAmountDays(double amount,int days) {
-			return getInterestRate()*amount*days/365;
-		}
-		//Self Encapsulate Field:自封装值域,相当于对field的一个delegation.
-		public double getInterestRate() {
-			return _type.getInterestRate();
-		}
-	}
-	class GoodAccountType{
-		double _interestRate;
-		public double getInterestRate(){
-			return _interestRate;
-		}
-		public void setInterestRate(double _interestRate){
-			this._interestRate = _interestRate;
-		}
-	}
+    class BadCase{
+        class Account {
+            AccountType type;
+            //逻辑上讲利率(interestRate)与计算方式同账户类型(AccountType)的关联更紧密.
+            double interestRate;
+            double interestForAmountDays(double amount,int days) {
+                return interestRate *amount*days/365;
+            }
+        }
+        class AccountType {
+        }
+    }
+
+    //-------------------------------------------------------------------------------------------------
+    class GoodCase{
+        class Account {
+            AccountType type;
+            //如果Account.interestForAmountDays已经暴露给过多Client,无法删除,则使用HideDelegate.
+            public double interestForAmountDays(double amount,int days) {
+                return type.interestForAmountDays(amount,days);
+            }
+        }
+        class AccountType {
+            //将属性和方法一起搬移至AccountType中.
+            double interestRate;
+            double interestForAmountDays(double amount,int days) {
+                return interestRate *amount*days/365;
+            }
+        }
+    }
 }
