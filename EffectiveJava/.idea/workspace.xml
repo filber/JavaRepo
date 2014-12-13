@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="96f2e340-8fd3-4399-ae0e-c90843decbce" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_3_8_1.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/effective-java-examples.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../SpringInAction/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../SpringInAction/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="effective-java-examples.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -256,6 +246,15 @@
       <created>1418483909170</created>
       <updated>1418483909170</updated>
     </task>
+    <task id="LOCAL-00001" summary="Effective Java.">
+      <created>1418484220788</created>
+      <updated>1418484220788</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Maven JUnit.">
+      <created>1418484268070</created>
+      <updated>1418484268070</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -302,6 +301,9 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
+    <MESSAGE value="Effective Java." />
+    <MESSAGE value="Maven JUnit." />
+    <option name="LAST_COMMIT_MESSAGE" value="Maven JUnit." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
