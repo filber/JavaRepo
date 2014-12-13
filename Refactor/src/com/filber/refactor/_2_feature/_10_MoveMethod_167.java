@@ -41,13 +41,11 @@ public class _10_MoveMethod_167 {
     class GoodCase{
         class Account {
             AccountType _type;
-            //daysOverdrawn仍是针对每个具体账户的属性,所以保留在Account.
             int _daysOverdrawn;
 
             double bankCharge() {
-                double result = 4.5;
-                result += _type.overdraftCharge(_daysOverdrawn);
-                return result;
+                //消除了临时变量result
+                return 4.5 + _type.overdraftCharge(_daysOverdrawn);
             }
         }
         class AccountType {
@@ -56,18 +54,11 @@ public class _10_MoveMethod_167 {
             }
             //搬移overdraftCharge至AccountType,并接收daysOverdrawn作为参数.
             double overdraftCharge(int daysOverdrawn) {
-                if (daysOverdrawn<=0) {
-                    return 0;
-                }
-                if (isPremium()) {
-                    double result = 10;
-                    if (daysOverdrawn>7) {
-                        result += (daysOverdrawn-7)*0.85;
-                    }
-                    return result;
-                } else {
-                    return daysOverdrawn*1.75;
-                }
+                if (daysOverdrawn<=0) return 0;//从Client中挪进来的逻辑.
+                //将表达式的条件翻转,从而易于使用Guard Clauses
+                if (!isPremium()) return daysOverdrawn*1.75;
+                if (daysOverdrawn>7) return  10+(daysOverdrawn-7)*0.85;
+                return 10;
             }
         }
     }
