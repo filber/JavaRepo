@@ -95,6 +95,111 @@ public class _23_DuplicateObservedData_214 {
     }
 
     //-------------------------------------------------------------------------------------------------
+    //书中给出的重构.
+    static class BookCase{
+        static public class ObserverIntervalWindow extends Frame{
+            FieldObservable fieldObservable;
+            TextField _startField;
+            TextField _endField;
+            TextField _lengthField;
+
+            public ObserverIntervalWindow() throws HeadlessException {
+                fieldObservable = new FieldObservable(_startField,_endField,_lengthField);
+                StartFieldObserver startFieldObserver = new StartFieldObserver(_startField);
+                fieldObservable.addObserver(startFieldObserver);
+                EndFieldObserver endFieldObserver = new EndFieldObserver(_endField);
+                fieldObservable.addObserver(endFieldObserver);
+                LengthFieldObserver lengthFieldObserver = new LengthFieldObserver(_lengthField);
+                fieldObservable.addObserver(lengthFieldObserver);
+            }
+
+            static class FieldObservable extends  Observable{
+                final TextField _startField;
+                final TextField _endField;
+                final TextField _lengthField;
+                FieldObservable(TextField _startField, TextField _endField, TextField _lengthField) {
+                    this._startField = _startField;
+                    this._endField = _endField;
+                    this._lengthField = _lengthField;
+                }
+                public void setStart(int start){
+                    _startField.setText(String.valueOf(start));
+                }
+                public void setEnd(int end){
+                    _endField.setText(String.valueOf(end));
+                }
+                public void setLength(int length){
+                    _lengthField.setText(String.valueOf(length));
+                }
+                public int getStart() {
+                    return Integer.parseInt(_startField.getText());
+                }
+                public int getEnd() {
+                    return Integer.parseInt(_endField.getText());
+                }
+                public int getLength() {
+                    return Integer.parseInt(_lengthField.getText());
+                }
+            }
+
+            static class StartFieldObserver implements Observer{
+                StartFieldObserver(Object source) {
+                    this.source = source;
+                }
+                Object source;
+                @Override
+                public void update(Observable o, Object arg) {
+                    if (source == arg) {
+                        FieldObservable observable = (FieldObservable)o;
+                        int start = observable.getStart();
+                        int end = observable.getEnd();
+                        int length = end - start;
+                        observable.setLength(length);
+                    }
+                }
+            }
+            static class LengthFieldObserver implements Observer{
+                LengthFieldObserver(Object source) {
+                    this.source = source;
+                }
+                Object source;
+                @Override
+                public void update(Observable o, Object arg) {
+                    if (source == arg) {
+                        FieldObservable observable = (FieldObservable)o;
+                        int start = observable.getStart();
+                        int end = observable.getEnd();
+                        int length = end - start;
+                        observable.setLength(length);
+                    }
+                }
+            }
+            static class EndFieldObserver implements Observer{
+                EndFieldObserver(Object source) {
+                    this.source = source;
+                }
+                Object source;
+                @Override
+                public void update(Observable o, Object arg) {
+                    if (source == arg) {
+                        FieldObservable observable = (FieldObservable)o;
+                        int start = observable.getStart();
+                        int length = observable.getLength();
+                        int end = start + length;
+                        observable.setEnd(end);
+                    }
+                }
+            }
+
+            class SynFocus extends FocusAdapter{
+                public void focusLost(FocusEvent e) {
+                    fieldObservable.notifyObservers(e.getSource());
+                }
+            }
+        }
+    }
+    //-------------------------------------------------------------------------------------------------
+    //进一步重构.
     static class GoodCase {
         //观察者类型枚举
         public enum FieldType {
