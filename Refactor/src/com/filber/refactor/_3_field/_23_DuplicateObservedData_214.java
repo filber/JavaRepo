@@ -258,11 +258,10 @@ public class _23_DuplicateObservedData_214 {
         //观察者抽象父类
         static abstract class FieldObserver implements Observer {
             private Object source;
-            private FieldObservable observable;
 
             //注册观察者的静态工厂
             public static void attachFieldObserver(FieldType type, Object field, FieldObservable observable) {
-                FieldObserver fieldObserver = null;
+                FieldObserver fieldObserver;
                 try {
                     fieldObserver = (FieldObserver) Class.forName(type.toString()).newInstance();
                 } catch (Exception e) {
