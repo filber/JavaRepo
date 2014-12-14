@@ -42,9 +42,10 @@ public class _19_ReplaceDataValueWithObject_200 {
         }
     }
 
-    //Customer为值对象,没有Setter的
-    //可以追加Method,但不适于追加信用等级,地址之类的可变属性.
+    //-------------------------------------------------------------------------------------------------
+    //抽取出值对象Customer
     class Customer {
+        //可以追加Method,但不适于追加信用等级,地址之类的可变属性.
         final String name;
 
         public Customer(String name) {
