@@ -3,76 +3,97 @@ package com.filber.refactor._3_field;
 import java.util.HashSet;
 
 /**
- * Created by Administrator on 2014/11/30.
+ * 将单向关联改为双向关联
  */
 public class _24_ChangeUniToBid_222 {
-    static class OldOrder{
-        private OldCustomer customer;
-        public OldCustomer getCustomer() {
-            return customer;
-        }
-        public void setCustomer(OldCustomer customer) {
-            this.customer = customer;
-        }
-    }
-    static class OldCustomer{
-    }
+    class OldCase {
+        //Order-->Customer
+        class Order {
+            private Customer customer;
 
-    //Order与Customer的关系为 N对1
-    static class NewOrder1 {
-        private NewCustomer1 customer;
-        public NewCustomer1 getCustomer() {
-            return customer;
-        }
-        //Association维护函数放在Order侧
-        public void setCustomer(NewCustomer1 customer) {
-            if (this.customer!=null){
-                this.customer.removeOrder(this);
+            public Customer getCustomer() {
+                return customer;
             }
-            this.customer = customer;
-            if (this.customer!=null){
-                this.customer.friendOrders().add(this);
+
+            public void setCustomer(Customer customer) {
+                this.customer = customer;
             }
         }
-    }
-    static class NewCustomer1 {
-        private HashSet<NewOrder1> orders;
-        //提供给Order使用的辅助函数!!
-        protected HashSet<NewOrder1> friendOrders(){
-            return orders;
-        }
-        public void addOrder(NewOrder1 order){
-            //调用Order的Association维护函数
-            order.setCustomer(this);
-        }
-        public void removeOrder(NewOrder1 order){
-            orders.remove(order);
+
+        class Customer {
         }
     }
 
-    //Order与Customer的关系为 N对N
-    static class NewOrder2{
-        private HashSet<NewCustomer2> customers;
-        //Association维护函数放在Order侧
-        public void addCustomer(NewCustomer2 customer){
-            customers.add(customer);
-            customer.friendOrders().add(this);
-        }
-        public void removeCustomer(NewCustomer2 customer){
-            customers.remove(customer);
-            customer.friendOrders().remove(this);
+    //------------------------------------------------------------------
+    class N2OneCase {
+        //Order(n)-->Customer(1)
+        class Order {
+            private Customer customer;
+
+            public Customer getCustomer() {
+                return customer;
+            }
+
+            //Association维护函数放在Order侧
+            public void setCustomer(Customer customer) {
+                if (this.customer != null) {
+                    this.customer.removeOrder(this);//断开旧的关系
+                }
+                this.customer = customer;
+                if (this.customer != null) {
+                    this.customer.friendOrders().add(this);//链接新的关系
+                }
+            }
+
+            class Customer {
+                private HashSet<Order> orders;
+
+                //提供给Order使用的protected辅助函数!!
+                protected HashSet<Order> friendOrders() {
+                    return orders;
+                }
+
+                public void addOrder(Order order) {
+                    order.setCustomer(this);//调用Order的Association维护函数
+                }
+
+                public void removeOrder(Order order) {
+                    orders.remove(order);
+                }
+            }
         }
     }
-    static class NewCustomer2{
-        private HashSet<NewOrder2> orders;
-        protected HashSet<NewOrder2> friendOrders(){
-            return orders;
+
+    //------------------------------------------------------------------
+    class N2NCase{
+        class Order {
+            private HashSet<Customer> customers;
+
+            //Association维护函数放在Order侧
+            public void addCustomer(Customer customer) {
+                customers.add(customer);
+                customer.friendOrders().add(this);
+            }
+
+            public void removeCustomer(Customer customer) {
+                customers.remove(customer);
+                customer.friendOrders().remove(this);
+            }
         }
-        public void addOrder(NewOrder2 order){
-            order.addCustomer(this);
-        }
-        public void removeOrder(NewOrder2 order){
-            order.removeCustomer(this);
+        class Customer {
+            private HashSet<Order> orders;
+
+            protected HashSet<Order> friendOrders() {
+                return orders;
+            }
+
+            public void addOrder(Order order) {
+                order.addCustomer(this);
+            }
+
+            public void removeOrder(Order order) {
+                order.removeCustomer(this);
+            }
         }
     }
 }
