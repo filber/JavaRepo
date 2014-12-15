@@ -1,60 +1,88 @@
 package com.filber.refactor._3_field;
 
 /**
- * Created by Administrator on 2014/12/2.
+ * 以类取代类型码
  */
 public class _30_ReplaceTypeCodeWithClass_243 {
-    static class OldPerson{
-        public static final int O = 0;
-        public static final int A = 1;
-        public static final int B = 2;
-        public static final int AB = 3;
+    class BadCase {
+        class Person {
+            public static final int O = 0;
+            public static final int A = 1;
+            public static final int B = 2;
+            public static final int AB = 3;
 
-        private int _bloodGroup;
-        OldPerson(int bloodGroup) {
-            this._bloodGroup = bloodGroup;
-        }
-        public int getBloodGroup() {
-            return _bloodGroup;
-        }
-        public void setBloodGroup(int bloodGroup) {
-            this._bloodGroup = bloodGroup;
+            private int bloodGroup;
+
+            Person(int bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
+
+            public int getBloodGroup() {
+                return bloodGroup;
+            }
+
+            public void setBloodGroup(int bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
         }
     }
 
-    //类型码不会影响宿主类的行为,则使用Replace Type Code with Class来处理它们
-    static class BloodGroup{
-        public static final BloodGroup O = new BloodGroup(0);
-        public static final BloodGroup A = new BloodGroup(1);
-        public static final BloodGroup B = new BloodGroup(2);
-        public static final BloodGroup AB = new BloodGroup(3);
-        private static final BloodGroup[] _values = {O,A,B,AB};
+    //------------------------------------------------------------------
+    //类型码不会影响宿主类的行为时,使用Replace Type Code with Class来处理它们
+    static class GoodCase {
+        static class BloodGroup {
+            public static final BloodGroup O = new BloodGroup(0);
+            public static final BloodGroup A = new BloodGroup(1);
+            public static final BloodGroup B = new BloodGroup(2);
+            public static final BloodGroup AB = new BloodGroup(3);
+            private static final BloodGroup[] BLOOD_VALUES = {O, A, B, AB};
 
-        //三个过渡函数
-//        public static BloodGroup code(int code){
-//            return _values[code];
-//        }
-//        public int getCode() {
-//            return _code;
-//        }
-//        public void setCode(int code) {
-//            this._code = code;
-//        }
-        private int _code;
-        private BloodGroup(int code) {
-            this._code = code;
+            private int code;
+
+            //Constructor声明为private
+            private BloodGroup(int code) {
+                this.code = code;
+            }
+        }
+
+        class Person {
+            private BloodGroup bloodGroup;
+
+            Person(BloodGroup bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
+
+            public BloodGroup getBloodGroup() {
+                return bloodGroup;
+            }
+
+            public void setBloodGroup(BloodGroup bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
         }
     }
-    static class NewPerson{
-        private BloodGroup _bloodGroup;
-        NewPerson(BloodGroup _bloodGroup) {
-            this._bloodGroup = _bloodGroup;
+
+    //------------------------------------------------------------------
+    //相比Class,使用枚举更加方便.
+    static class EnumCase {
+        enum BloodGroup {
+            O, A, B, AB
         }
-        public BloodGroup getBloodGroup() {
-            return _bloodGroup;
-        }
-        public void setBloodGroup(BloodGroup bloodGroup) {
-            this._bloodGroup = bloodGroup;
+
+        class Person {
+            private BloodGroup bloodGroup;
+
+            Person(BloodGroup bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
+
+            public BloodGroup getBloodGroup() {
+                return bloodGroup;
+            }
+
+            public void setBloodGroup(BloodGroup bloodGroup) {
+                this.bloodGroup = bloodGroup;
+            }
         }
     }
 }
