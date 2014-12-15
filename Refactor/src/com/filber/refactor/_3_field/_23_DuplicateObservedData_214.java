@@ -211,11 +211,11 @@ public class _23_DuplicateObservedData_214 {
         //字段值对象(属性均为private final)
         public class FieldItem {
             private final FieldType type;
-            private final FieldObserver observer;
+            private final TextField field;
 
-            public FieldItem(FieldType type, FieldObserver observer) {
+            public FieldItem(FieldType type, TextField field) {
                 this.type = type;
-                this.observer = observer;
+                this.field = field;
             }
         }
 
@@ -237,21 +237,21 @@ public class _23_DuplicateObservedData_214 {
         //抽取出DomainClass,担当被观察者的角色.
         static class FieldObservable extends Observable {
 
-            private final Map<FieldType, FieldObserver> fieldItemMap = new ConcurrentHashMap<FieldType, FieldObserver>();
+            private final Map<FieldType, TextField> fieldItemMap = new ConcurrentHashMap<FieldType, TextField>();
 
             FieldObservable(FieldItem[] fieldItems) {
                 for (FieldItem fieldItem : fieldItems) {
-                    fieldItemMap.put(fieldItem.type, fieldItem.observer);
-                    FieldObserver.attachFieldObserver(fieldItem.type, fieldItem.observer, this);
+                    fieldItemMap.put(fieldItem.type, fieldItem.field);
+                    FieldObserver.attachFieldObserver(fieldItem.type, fieldItem.field, this);
                 }
             }
 
             public void setProperty(FieldType type, int value) {
-                ((TextField) fieldItemMap.get(type).source).setText(String.valueOf(value));
+                ((TextField) fieldItemMap.get(type)).setText(String.valueOf(value));
             }
 
             public int getProperty(FieldType type) {
-                return Integer.valueOf(((TextField) fieldItemMap.get(type).source).getText());
+                return Integer.valueOf(((TextField) fieldItemMap.get(type)).getText());
             }
         }
 

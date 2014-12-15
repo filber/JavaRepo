@@ -65,7 +65,7 @@ public class _24_ChangeUniToBid_222 {
     }
 
     //------------------------------------------------------------------
-    class N2NCase{
+    class N2NCase {
         class Order {
             private HashSet<Customer> customers;
 
@@ -80,6 +80,7 @@ public class _24_ChangeUniToBid_222 {
                 customer.friendOrders().remove(this);
             }
         }
+
         class Customer {
             private HashSet<Order> orders;
 
