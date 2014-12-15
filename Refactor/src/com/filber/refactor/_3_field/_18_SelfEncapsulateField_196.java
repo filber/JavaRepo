@@ -4,14 +4,13 @@ package com.filber.refactor._3_field;
  * 自封装字段
  */
 public class _18_SelfEncapsulateField_196 {
-
+    //类内部
     class OldCase{
         class IntRange {
-            // 字段以public暴露给外部.
-            public int low, high;
+            private int low, high;// 字段访问标识为private,类外部不可访问.
 
             boolean includes(int arg) {
-                return arg >= low && arg <= high;
+                return arg >= low && arg <= high;//类内部跨过Getter直接访问字段.
             }
 
             void grow(int factor) {
@@ -59,8 +58,7 @@ public class _18_SelfEncapsulateField_196 {
         }
 
         class CappedRange extends IntRange {
-            //CappedRange实例一旦创建则cap即不可更改.
-            private final int cap;
+            private final int cap;//CappedRange实例一旦创建则cap即不可更改.
 
             public CappedRange(int low, int high, int cap) {
                 super(low, high);
