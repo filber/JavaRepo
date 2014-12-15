@@ -8,7 +8,7 @@ public class _27_EncapsulateField_231 {
         //与SelfEncapsulateField不同,它的字段已经是private了.
         public String name;
     }
-
+    //------------------------------------------------------------------
     class GoodCase {
         private String name;
 
