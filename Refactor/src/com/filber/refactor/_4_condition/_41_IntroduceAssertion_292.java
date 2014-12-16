@@ -1,7 +1,7 @@
 package com.filber.refactor._4_condition;
 
 /**
- * Created by Administrator on 2014/12/4.
+ * 引入断言
  */
 public class _41_IntroduceAssertion_292 {
     public static void testCase(){
