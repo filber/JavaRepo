@@ -1,7 +1,7 @@
 package com.filber.refactor._5_invocation;
 
 /**
- * Created by Administrator on 2014/12/5.
+ * 保留对象完整
  */
 public class _48_PreserveWholeObject_313 {
     static class BadCase{
@@ -56,9 +56,8 @@ public class _48_PreserveWholeObject_313 {
         }
         static class Room{
             private TempRange range;
-            //通过使用已有的对象缩减参数长度
             public boolean withinPlan(HeatingPlan plan){
-                return plan.withinRange(range);
+                return plan.withinRange(range);//Delegate
             }
         }
     }
