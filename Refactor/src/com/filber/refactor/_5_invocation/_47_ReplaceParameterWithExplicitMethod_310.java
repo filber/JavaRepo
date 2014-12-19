@@ -1,7 +1,7 @@
 package com.filber.refactor._5_invocation;
 
 /**
- * Created by Administrator on 2014/12/5.
+ * 以明确函数取代参数
  */
 public class _47_ReplaceParameterWithExplicitMethod_310 {
     private int height;
