@@ -3,7 +3,7 @@ package com.filber.refactor._5_invocation;
 import java.util.Date;
 
 /**
- * Created by Administrator on 2014/12/5.
+ * 添加参数
  */
 public class _43_AddParameter_300 {
 
