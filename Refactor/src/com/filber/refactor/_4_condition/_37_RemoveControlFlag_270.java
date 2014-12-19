@@ -25,7 +25,7 @@ public class _37_RemoveControlFlag_270 {
     //以break取代Control Flag
     public void breakCheckSecurity(String[] people) {
         for (int i = 0; i < people.length; i++) {
-            if (isBadPerson(people[i])) {
+            if (isBadPerson(people[i])) {//Decompose Conditional
                 sendAlert();
                 break;
             }
@@ -33,7 +33,7 @@ public class _37_RemoveControlFlag_270 {
     }
 
     private boolean isBadPerson(String person) {
-        return "Don".equals(person) || "John".equals(person);
+        return "Don".equals(person) || "John".equals(person);//Consolidate Expression
     }
 
     //-------------------------------------------------------------------------------------------------
