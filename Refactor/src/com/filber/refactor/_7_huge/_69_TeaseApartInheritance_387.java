@@ -3,7 +3,7 @@ package com.filber.refactor._7_huge;
 /**
  * 梳理并分解继承体系
  */
-public class _70_TeaseApartInheritance_387 {
+public class _69_TeaseApartInheritance_387 {
 
     class BadCase {
         //Deal<--ActiveDeal&PassiveDeal

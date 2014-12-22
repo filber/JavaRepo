@@ -5,7 +5,7 @@ import java.util.Vector;
 /**
  * 将过程化设计转化为对象设计
  */
-public class _69_ConvertProceduralDesignToObjects_393 {
+public class _70_ConvertProceduralDesignToObjects_393 {
     class BadCase {
         class Order {
             private Vector<OrderLine> orderLines;
