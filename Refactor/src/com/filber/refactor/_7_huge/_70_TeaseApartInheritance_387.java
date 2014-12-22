@@ -5,31 +5,53 @@ package com.filber.refactor._7_huge;
  */
 public class _70_TeaseApartInheritance_387 {
 
-    class BadCase{
+    class BadCase {
         //Deal<--ActiveDeal&PassiveDeal
         //ActiveDeal<--TabularActiveDeal
         //PassiveDeal<--TabularPassiveDeal
-        class Deal{}
-        class ActiveDeal extends Deal{}
-        class PassiveDeal extends Deal{}
-        class TabularActiveDeal extends ActiveDeal{}
-        class SingleActiveDeal extends ActiveDeal{}
-        class TabularPassiveDeal extends PassiveDeal{}
-        class SinglePassiveDeal extends PassiveDeal{}
+        class Deal {
+        }
+
+        class ActiveDeal extends Deal {
+        }
+
+        class PassiveDeal extends Deal {
+        }
+
+        class TabularActiveDeal extends ActiveDeal {
+        }
+
+        class SingleActiveDeal extends ActiveDeal {
+        }
+
+        class TabularPassiveDeal extends PassiveDeal {
+        }
+
+        class SinglePassiveDeal extends PassiveDeal {
+        }
     }
 
     //------------------------------------------------------------------
-    class GoodCase{
+    class GoodCase {
         //Deal<--ActiveDeal&PassiveDeal
-        class Deal{
+        class Deal {
             private PresentationStyle presentationStyle;
         }
-        class ActiveDeal extends Deal{}
-        class PassiveDeal extends Deal{}
+
+        class ActiveDeal extends Deal {
+        }
+
+        class PassiveDeal extends Deal {
+        }
 
         //PresentationStyle<--SingleStyle&TabularStyle+
-        class PresentationStyle{}
-        class SingleStyle extends PresentationStyle{}
-        class TabularStyle extends PresentationStyle{}
+        class PresentationStyle {
+        }
+
+        class SingleStyle extends PresentationStyle {
+        }
+
+        class TabularStyle extends PresentationStyle {
+        }
     }
 }
