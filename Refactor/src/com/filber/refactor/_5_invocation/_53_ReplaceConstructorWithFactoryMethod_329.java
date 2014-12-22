@@ -81,6 +81,7 @@ public class _53_ReplaceConstructorWithFactoryMethod_329 {
     }
 
     //-------------------------------------------------------------------------------------------------
+    //以调用显式方法的方式创建子类实例
     static class ExplicitMethodCase {
         static class Person {
             public static Person createMale() {

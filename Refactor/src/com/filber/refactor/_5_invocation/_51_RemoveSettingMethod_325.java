@@ -1,7 +1,7 @@
 package com.filber.refactor._5_invocation;
 
 /**
- * 移除设置函数
+ * 移除设值函数
  */
 public class _51_RemoveSettingMethod_325 {
     static class BadCase {
