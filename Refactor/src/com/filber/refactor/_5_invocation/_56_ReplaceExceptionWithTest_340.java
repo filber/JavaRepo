@@ -9,56 +9,63 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 /**
- * Created by Administrator on 2014/12/9.
+ * 以测试取代异常
  */
 public class _56_ReplaceExceptionWithTest_340 {
+    //异常只应该用于异常的,罕见的行为.
+    //对于意料之内的错误,应用条件测试予以避免.
+
     private Stack<MyResource> available;
     private Stack<MyResource> allocated;
 
-    static class MyResource extends Resource{
-        @Override
+    static class MyResource extends Resource {
         public String getName() {
             return null;
         }
-        @Override
+
         public URL getURL() {
             return null;
         }
-        @Override
+
         public URL getCodeSourceURL() {
             return null;
         }
-        @Override
+
         public InputStream getInputStream() throws IOException {
             return null;
         }
-        @Override
+
         public int getContentLength() throws IOException {
             return 0;
         }
     }
 
-    public Resource oldGetResource(){
-        MyResource resource;
-        try{
-            resource = available.pop();
-            allocated.push(resource);
-            return resource;
-        }catch (EmptyStackException e){
-            resource=new MyResource();
-            allocated.push(resource);
-            return resource;
+    //------------------------------------------------------------------
+    class BadCase {
+        public Resource getResource() {
+            MyResource resource;
+            try {
+                resource = available.pop();
+                allocated.push(resource);
+                return resource;
+            } catch (EmptyStackException e) {
+                resource = new MyResource();
+                allocated.push(resource);
+                return resource;
+            }
         }
     }
 
     //-------------------------------------------------------------------------------------------------
+    class GoodCase {
+        public Resource getResource() {
+            MyResource resource;
+            if (available.isEmpty()) resource = new MyResource();
+            else resource = available.pop();
 
-    public Resource newGetResource(){
-        MyResource resource;
-        if (available.isEmpty()) resource = new MyResource();
-        else resource = available.pop();
-        //Consolidate Duplicate Conditional Fragments
-        allocated.push(resource);
-        return resource;
+            //Consolidate Duplicate Conditional Fragments
+            allocated.push(resource);
+            return resource;
+        }
     }
 }
