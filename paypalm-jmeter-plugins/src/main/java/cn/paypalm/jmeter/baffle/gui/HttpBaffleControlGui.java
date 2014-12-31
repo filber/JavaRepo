@@ -28,7 +28,6 @@ import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
-import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -48,14 +47,12 @@ public class HttpBaffleControlGui extends LogicControllerGui
 
     private JTextField maxQueueSizeField;
 
-    private JButton stop, start, run;
+    private JButton stop, start;
 
     private static final String ACTION_STOP = "stop"; // $NON-NLS-1$
 
     private static final String ACTION_START = "start"; // $NON-NLS-1$
     
-    private static final String ACTION_RUN = "RUN"; // $NON-NLS-1$
-
     private HttpBaffleControl baffleController;
 
 
@@ -116,6 +113,9 @@ public class HttpBaffleControlGui extends LogicControllerGui
         log.debug("Configuring gui with " + element);
         super.configure(element);
         baffleController = (HttpBaffleControl) element;
+        
+        selected = baffleController.getSelectedNode();
+        
         portField.setText(baffleController.getPortString());
         maxPoolSizeField.setText(baffleController.getMaxPoolSizeAsString());
         maxQueueSizeField.setText(baffleController.getMaxQueueSizeAsString());
@@ -137,10 +137,7 @@ public class HttpBaffleControlGui extends LogicControllerGui
             baffleController.startHttpMirror();
             start.setEnabled(false);
             stop.setEnabled(true);
-        } else if (ACTION_RUN.equals(command)) {
-			modifyTestElement(baffleController);
-			baffleController.runBaffle();
-		}
+        }
     }
 
     private void init() {
@@ -172,15 +169,9 @@ public class HttpBaffleControlGui extends LogicControllerGui
         stop.setActionCommand(ACTION_STOP);
         stop.setEnabled(false);
 
-        run = new JButton("Run");
-        run.addActionListener(this);
-        run.setActionCommand(ACTION_RUN);
-        run.setEnabled(true);
-        
         JPanel panel = new JPanel();
         panel.add(start);
         panel.add(stop);
-        panel.add(run);
         return panel;
     }
 
@@ -262,12 +253,7 @@ public class HttpBaffleControlGui extends LogicControllerGui
                 name.setLength(0);
                 JMeterTreeNode cur = (JMeterTreeNode) node.getChildAt(i);
                 TestElement te = cur.getTestElement();
-                if (te instanceof AbstractThreadGroup) {
-                    name.append(parent_name);
-                    name.append(cur.getName());
-                    name.append(separator);
-                    buildNodesModel(cur, name.toString(), level);
-                } else if (te instanceof Controller && !(te instanceof ModuleController)&& !(te instanceof HttpBaffleControl)) {
+                if (te instanceof Controller && !(te instanceof ModuleController) && !(te instanceof HttpBaffleControl)) {
                     name.append(parent_name);
                     name.append(cur.getName());
                     TreeNodeWrapper tnw = new TreeNodeWrapper(cur, name.toString());

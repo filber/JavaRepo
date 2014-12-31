@@ -1,13 +1,18 @@
 package cn.paypalm.jmeter.baffle.server;
 
-import org.apache.jmeter.control.Controller;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.tree.TreeNode;
+
 import org.apache.jmeter.control.GenericController;
+import org.apache.jmeter.control.ModuleController;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.testelement.AbstractTestElement;
+import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.IntegerProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.NullProperty;
 
 //For unit tests, @see TestHttpMirrorControl
 
@@ -27,12 +32,14 @@ public class HttpBaffleControl extends GenericController {
     public static final String DEFAULT_PORT_S =
         Integer.toString(DEFAULT_PORT);// Used by GUI
 
-    public static final String PORT = "HttpMirrorControlGui.port"; // $NON-NLS-1$
+    public static final String PORT = "HttpBaffleControlGui.port"; // $NON-NLS-1$
 
-    public static final String MAX_POOL_SIZE = "HttpMirrorControlGui.maxPoolSize"; // $NON-NLS-1$
+    public static final String MAX_POOL_SIZE = "HttpBaffleControlGui.maxPoolSize"; // $NON-NLS-1$
 
-    public static final String MAX_QUEUE_SIZE = "HttpMirrorControlGui.maxQueueSize"; // $NON-NLS-1$
+    public static final String MAX_QUEUE_SIZE = "HttpBaffleControlGui.maxQueueSize"; // $NON-NLS-1$
 
+    private static final String NODE_PATH = "HttpBaffleControlGui.node_path";// $NON-NLS-1$
+    
     public static final int DEFAULT_MAX_POOL_SIZE = 0;
 
     public static final int DEFAULT_MAX_QUEUE_SIZE = 25;
@@ -51,10 +58,6 @@ public class HttpBaffleControl extends GenericController {
         setProperty(new IntegerProperty(PORT, port));
     }
 
-    public void setSelectedNode(JMeterTreeNode selectedNode) {
-		this.selectedNode = selectedNode;
-	}
-    
     public void setPort(int port) {
         initPort(port);
     }
@@ -117,8 +120,75 @@ public class HttpBaffleControl extends GenericController {
         return DEFAULT_PORT;
     }
 
+    public void setSelectedNode(JMeterTreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+		setNodePath();
+	}
+    
+    public JMeterTreeNode getSelectedNode() {
+        if (selectedNode == null){
+            restoreSelected();
+        }
+        return selectedNode;
+    }
+    
+    private void restoreSelected() {
+        GuiPackage gp = GuiPackage.getInstance();
+        if (gp != null) {
+            JMeterTreeNode root = (JMeterTreeNode) gp.getTreeModel().getRoot();
+            resolveReplacementSubTree(root);
+        }
+    }
+    
+    private void resolveReplacementSubTree(JMeterTreeNode context) {
+        if (selectedNode == null) {
+            List<?> nodePathList = getNodePath();
+            if (nodePathList != null && nodePathList.size() > 0) {
+                traverse(context, nodePathList, 1);
+            }
+        }
+    }
+
+    private void traverse(JMeterTreeNode node, List<?> nodePath, int level) {
+        if (node != null && nodePath.size() > level) {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                JMeterTreeNode cur = (JMeterTreeNode) node.getChildAt(i);
+                // Bug55375 - don't allow selectedNode to be a ModuleController as can cause recursion
+                if (!(cur.getTestElement() instanceof ModuleController)) {
+                    if (cur.getName().equals(nodePath.get(level).toString())) {
+                        if (nodePath.size() == (level + 1)) {
+                            selectedNode = cur;
+                        }
+                        traverse(cur, nodePath, level + 1);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void setNodePath() {
+        List<String> nodePath = new ArrayList<String>();
+        if (selectedNode != null) {
+            TreeNode[] path = selectedNode.getPath();
+            for (TreeNode node : path) {
+                nodePath.add(((JMeterTreeNode) node).getName());
+            }
+        }
+        setProperty(new CollectionProperty(NODE_PATH, nodePath));
+    }
+    
+    public List<?> getNodePath() {
+        JMeterProperty prop = getProperty(NODE_PATH);
+        if (!(prop instanceof NullProperty)) {
+            return (List<?>) ((CollectionProperty) prop).getObjectValue();
+        }
+        return null;
+    }
+    
     public void startHttpMirror() {
-        server = new HttpBaffleServer(getPort(), getMaxPoolSize(), getMaxQueueSize());
+    	if (selectedNode==null) return;
+
+    	server = new HttpBaffleServer(getPort(), getMaxPoolSize(), getMaxQueueSize(),getSelectedNode());
         server.start();
         GuiPackage instance = GuiPackage.getInstance();
         if (instance != null) {
@@ -139,19 +209,6 @@ public class HttpBaffleControl extends GenericController {
             }
             server = null;
         }
-    }
-    
-    public void runBaffle() {
-    	if (selectedNode==null) return;
-    	Object userObject = selectedNode.getUserObject();
-    	if (userObject instanceof Controller) {
-    		Controller controller = (Controller)userObject;
-    		Sampler sampler = null;
-    		while ((sampler =controller.next())!=null) {
-				SampleResult result = sampler.sample(null);
-				System.out.println(result);
-			}
-		}
     }
 
     @Override

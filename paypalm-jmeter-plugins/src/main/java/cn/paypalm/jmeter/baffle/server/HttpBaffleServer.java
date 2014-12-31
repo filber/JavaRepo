@@ -7,10 +7,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.jmeter.engine.JMeterEngine;
 import org.apache.jmeter.gui.Stoppable;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JOrphanUtils;
 import org.apache.log.Logger;
+
+import cn.paypalm.jmeter.baffle.samplers.BaffleResultListener;
 
 /**
  * Server daemon thread.
@@ -50,14 +54,17 @@ public class HttpBaffleServer extends Thread implements Stoppable {
      */
     private int maxQueueSize;
 
+	private JMeterTreeNode selectedNode;
+
+    
     /**
      * Create a new Daemon with the specified port and target.
      *
      * @param port
      *            the port to listen on.
      */
-    public HttpBaffleServer(int port) {
-       this(port, HttpBaffleControl.DEFAULT_MAX_POOL_SIZE, HttpBaffleControl.DEFAULT_MAX_QUEUE_SIZE);
+    public HttpBaffleServer(int port,JMeterEngine engine,JMeterTreeNode selectedNode) {
+       this(port, HttpBaffleControl.DEFAULT_MAX_POOL_SIZE, HttpBaffleControl.DEFAULT_MAX_QUEUE_SIZE,selectedNode);
     }
     
     /**
@@ -67,12 +74,14 @@ public class HttpBaffleServer extends Thread implements Stoppable {
      *            the port to listen on.
      * @param maxThreadPoolSize Max Thread pool size
      * @param maxQueueSize Max Queue size
+     * @param resultListener 
      */
-    public HttpBaffleServer(int port, int maxThreadPoolSize, int maxQueueSize) {
-        super("HttpMirrorServer");
+    public HttpBaffleServer(int port, int maxThreadPoolSize, int maxQueueSize,JMeterTreeNode selectedNode) {
+        super("HttpBaffleServer");
         this.daemonPort = port;
         this.maxThreadPoolSize = maxThreadPoolSize;
         this.maxQueueSize = maxQueueSize;
+        this.selectedNode = selectedNode;
     }
 
     /**
@@ -105,9 +114,9 @@ public class HttpBaffleServer extends Thread implements Stoppable {
                     if (running) {
                         // Pass request to new thread
                         if(threadPoolExecutor != null) {
-                            threadPoolExecutor.execute(new HttpBaffleThread(clientSocket));
+                            threadPoolExecutor.execute(new HttpBaffleThread(clientSocket,selectedNode));
                         } else {
-                            Thread thd = new Thread(new HttpBaffleThread(clientSocket));
+                            Thread thd = new Thread(new HttpBaffleThread(clientSocket,selectedNode));
                             log.debug("Starting new Mirror thread");
                             thd.start();
                         }
@@ -140,14 +149,4 @@ public class HttpBaffleServer extends Thread implements Stoppable {
         return except;
     }
 
-    public static void main(String args[]){
-        int port = HttpBaffleControl.DEFAULT_PORT;
-        if (args.length > 0){
-            port = Integer.parseInt(args[0]);
-        }
-        LoggingManager.setPriority("INFO"); // default level
-        LoggingManager.setLoggingLevels(System.getProperties() ); // allow override by system properties
-        HttpBaffleServer serv = new HttpBaffleServer(port);
-        serv.start();
-    }
 }
