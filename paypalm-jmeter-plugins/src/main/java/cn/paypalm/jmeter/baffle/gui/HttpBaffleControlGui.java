@@ -28,6 +28,7 @@ import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -253,7 +254,9 @@ public class HttpBaffleControlGui extends LogicControllerGui
                 name.setLength(0);
                 JMeterTreeNode cur = (JMeterTreeNode) node.getChildAt(i);
                 TestElement te = cur.getTestElement();
-                if (te instanceof Controller && !(te instanceof ModuleController) && !(te instanceof HttpBaffleControl)) {
+				if (te instanceof Controller
+						&& !(te instanceof ModuleController)
+						&& !(te instanceof HttpBaffleControl)) {
                     name.append(parent_name);
                     name.append(cur.getName());
                     TreeNodeWrapper tnw = new TreeNodeWrapper(cur, name.toString());

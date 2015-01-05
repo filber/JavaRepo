@@ -126,30 +126,30 @@ public class HttpBaffleThread implements Runnable {
 
 	private static HashTree  getReplacementSubTree(JMeterTreeNode selectedNode,TestPlan testPlan,BaffleResultListener listener) {
 		HashTree tree = new ListedHashTree();
-        if (selectedNode != null) {
-            // Use a local variable to avoid replacing reference by modified clone (see Bug 54950)
-            JMeterTreeNode nodeToReplace = selectedNode;
-            // We clone to avoid enabling existing node
-            if (!nodeToReplace.isEnabled()) {
-                nodeToReplace = cloneTreeNode(selectedNode);
-                nodeToReplace.setEnabled(true);
-            }
-            
-            HashTree testPlanHashTree = tree.add(testPlan);
-            
-            testPlanHashTree.add(listener);
-
-            ThreadGroup threadGroup = new ThreadGroup();
-            threadGroup.setNumThreads(1);
-            
-            LoopController loopController = new LoopController();
-            loopController.setLoops(1);
-            threadGroup.setSamplerController(loopController);
-
-            HashTree threadGroupHashTree = testPlanHashTree.add(threadGroup);
-            HashTree subtree = threadGroupHashTree.add(nodeToReplace.getUserObject());
-            createSubTree(subtree, nodeToReplace);
+		if (selectedNode==null)return tree;
+		
+        // Use a local variable to avoid replacing reference by modified clone (see Bug 54950)
+        JMeterTreeNode nodeToReplace = selectedNode;
+        // We clone to avoid enabling existing node
+        if (!nodeToReplace.isEnabled()) {
+            nodeToReplace = cloneTreeNode(selectedNode);
+            nodeToReplace.setEnabled(true);
         }
+        
+        HashTree testPlanHashTree = tree.add(testPlan);
+        
+        testPlanHashTree.add(listener);
+
+        ThreadGroup threadGroup = new ThreadGroup();
+        threadGroup.setNumThreads(1);
+        
+        LoopController loopController = new LoopController();
+        loopController.setLoops(1);
+        threadGroup.setSamplerController(loopController);
+
+        HashTree threadGroupHashTree = testPlanHashTree.add(threadGroup);
+        HashTree subtree = threadGroupHashTree.add(((TestElement)nodeToReplace.getUserObject()).clone());
+        createSubTree(subtree, nodeToReplace);
         return tree;
 	}
 	
@@ -157,8 +157,9 @@ public class HttpBaffleThread implements Runnable {
         Enumeration<JMeterTreeNode> e = node.children();
         while (e.hasMoreElements()) {
             JMeterTreeNode subNode = e.nextElement();
-            tree.add(subNode.getUserObject());
-            createSubTree(tree.getTree(subNode.getUserObject()), subNode);
+            HashTree subTree= tree.add(((TestElement)subNode.getUserObject()).clone());
+//            createSubTree(tree.getTree(subNode.getUserObject()), subNode);
+            createSubTree(subTree, subNode);
         }
     }
 	
