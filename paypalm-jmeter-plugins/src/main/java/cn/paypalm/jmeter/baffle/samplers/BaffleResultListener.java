@@ -14,7 +14,7 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
 	
-	public static final SynchronousQueue<String> sampleResultQueue = new SynchronousQueue<>();
+	public static final SynchronousQueue<String> sampleResultQueue = new SynchronousQueue<String>();
 	
 	public static String getResponseData() throws InterruptedException, BrokenBarrierException {
 		return sampleResultQueue.take();
