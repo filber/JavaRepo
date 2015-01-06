@@ -62,9 +62,8 @@ public class HttpBaffleThread implements Runnable {
 		try {
 			in = new BufferedInputStream(clientSocket.getInputStream());
 			out = new BufferedOutputStream(clientSocket.getOutputStream());
-			
+
 			TestPlan testPlan = new TestPlan();
-			
 			int contentLength = -1;
 			byte[] buffer = new byte[1024];
 			StringBuilder headers = new StringBuilder();
@@ -110,10 +109,16 @@ public class HttpBaffleThread implements Runnable {
 			engine.runTest();
 			String responseData = BaffleResultListener.getResponseData();
 			log.info(responseData);
-			engine.reset();
-//			engine.exit();
-			out.write(responseData.getBytes());
-			out.flush();
+
+            // The headers are written using ISO_8859_1 encoding
+            out.write(("HTTP/1.0 200 OK").getBytes(ISO_8859_1)); //$NON-NLS-1$
+            out.write(CRLF);
+            out.write("Content-Type: text/plain".getBytes(ISO_8859_1)); //$NON-NLS-1$
+            out.write(CRLF);
+            out.write(CRLF);
+			out.write(responseData.getBytes(ISO_8859_1));
+            out.flush();
+
 		} catch (Exception e) {
 			log.error("", e);
 		} finally {
