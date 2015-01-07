@@ -1,9 +1,8 @@
 package cn.paypalm.jmeter.baffle.samplers;
 
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.SynchronousQueue;
-
+import java.util.concurrent.TimeUnit;
 import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
@@ -17,16 +16,23 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
 	public static final SynchronousQueue<String> sampleResultQueue = new SynchronousQueue<String>();
 	
 	public static String getResponseData() throws InterruptedException, BrokenBarrierException {
-		return sampleResultQueue.take();
-	}
+        String result = sampleResultQueue.poll(5, TimeUnit.SECONDS);
+        if (result == null) {
+            result = "TIME OUT for listening sample result. Make sure you have at least one BaffleSampler.";
+        }
+        log.info("Sample Result:" + result);
+        return result;
+    }
 
 	@Override
 	public void sampleOccurred(SampleEvent e) {
-		try {
-			sampleResultQueue.put(e.getResult().getResponseDataAsString());
-		} catch (InterruptedException e1) {
-			log.error("", e1);
-		}
+        if ("BaffleSampler".equals(e.getResult().getSampleLabel())) {
+            try {
+                sampleResultQueue.put(e.getResult().getResponseDataAsString());
+            } catch (InterruptedException e1) {
+                log.error("", e1);
+            }
+        }
 	}
 
 	@Override
@@ -36,5 +42,4 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
 	@Override
 	public void sampleStopped(SampleEvent e) {
 	}
-
 }
