@@ -108,7 +108,6 @@ public class HttpBaffleThread implements Runnable {
 	    	engine.configure(getReplacementSubTree(selectedNode,testPlan,listener));
 			engine.runTest();
 			String responseData = BaffleResultListener.getResponseData();
-			log.info(responseData);
 
             // The headers are written using ISO_8859_1 encoding
             out.write(("HTTP/1.0 200 OK").getBytes(ISO_8859_1)); //$NON-NLS-1$
@@ -162,9 +161,11 @@ public class HttpBaffleThread implements Runnable {
         Enumeration<JMeterTreeNode> e = node.children();
         while (e.hasMoreElements()) {
             JMeterTreeNode subNode = e.nextElement();
-            HashTree subTree= tree.add(((TestElement)subNode.getUserObject()).clone());
-//            createSubTree(tree.getTree(subNode.getUserObject()), subNode);
-            createSubTree(subTree, subNode);
+            TestElement testElement = (TestElement)subNode.getUserObject();
+            if (testElement.isEnabled()){
+                HashTree subTree= tree.add(testElement.clone());
+                createSubTree(subTree, subNode);
+            }
         }
     }
 	
