@@ -13,9 +13,9 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
 	
-	public static final SynchronousQueue<String> sampleResultQueue = new SynchronousQueue<String>();
+	private final SynchronousQueue<String> sampleResultQueue = new SynchronousQueue<String>();
 	
-	public static String getResponseData() throws InterruptedException, BrokenBarrierException {
+	public String getResponseData() throws InterruptedException, BrokenBarrierException {
         String result = sampleResultQueue.poll(5, TimeUnit.SECONDS);
         if (result == null) {
             result = "TIME OUT for listening sample result. Make sure you have at least one BaffleSampler.";
@@ -42,4 +42,9 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
 	@Override
 	public void sampleStopped(SampleEvent e) {
 	}
+
+    @Override
+    public Object clone() {
+        return this;
+    }
 }

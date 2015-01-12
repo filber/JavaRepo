@@ -107,7 +107,7 @@ public class HttpBaffleThread implements Runnable {
 	    	
 	    	engine.configure(getReplacementSubTree(selectedNode,testPlan,listener));
 			engine.runTest();
-			String responseData = BaffleResultListener.getResponseData();
+			String responseData = listener.getResponseData();
 
             // The headers are written using ISO_8859_1 encoding
             out.write(("HTTP/1.0 200 OK").getBytes(ISO_8859_1)); //$NON-NLS-1$
