@@ -1,14 +1,14 @@
 package cn.paypalm.jmeter.baffle.server;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.JMeterEngine;
@@ -16,6 +16,7 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
@@ -70,9 +71,7 @@ public class HttpBaffleThread implements Runnable {
 			String headerString = null;
 			int length = 0;
 			int positionOfBody = 0;
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			while (positionOfBody <= 0 && ((length = in.read(buffer)) != -1)) {
-				baos.write(buffer, 0, length); // echo back
 				headers.append(new String(buffer, 0, length, ISO_8859_1));
 				positionOfBody = getPositionOfBody(headers.toString());
 			}
@@ -86,7 +85,7 @@ public class HttpBaffleThread implements Runnable {
 				contentLength = Integer.parseInt(contentLengthHeaderValue);
 				contentBody = headerString.substring(headerString.length()
 						- contentLength);
-				testPlan.addParameter("HttpBaffleContentBody", contentBody);
+				testPlan.addParameter("HttpBaffleContentBody", contentBody);//Prop-报文体
 			}
 			
 			String requestPath = null;
@@ -94,30 +93,20 @@ public class HttpBaffleThread implements Runnable {
 				Map<String, String> params = new HashMap<String,String>();
 				requestPath = getRequestPath(headerString, params);
 				for (String key : params.keySet()) {
-					testPlan.addParameter(key, params.get(key));
+					testPlan.addParameter(key, params.get(key));//Prop-参数列表
 				}
 			} else {
 				requestPath = getRequestPath(headerString);
 			}
-			
+            testPlan.addParameter("HttpBaffleRequestPath", requestPath);//Prop-请求路径
+
 	    	JMeterEngine engine = new StandardJMeterEngine();
-	    	
-	    	testPlan.addParameter("HttpBaffleRequestPath", requestPath);
-	    	BaffleResultListener listener = new BaffleResultListener();
-	    	
+            CyclicBarrier barrier = new CyclicBarrier(2);
+	    	BaffleResultListener listener = new BaffleResultListener(headerString,out,barrier);
 	    	engine.configure(getReplacementSubTree(selectedNode,testPlan,listener));
 			engine.runTest();
-			String responseData = listener.getResponseData();
 
-            // The headers are written using ISO_8859_1 encoding
-            out.write(("HTTP/1.0 200 OK").getBytes(ISO_8859_1)); //$NON-NLS-1$
-            out.write(CRLF);
-            out.write("Content-Type: text/plain".getBytes(ISO_8859_1)); //$NON-NLS-1$
-            out.write(CRLF);
-            out.write(CRLF);
-			out.write(responseData.getBytes(ISO_8859_1));
-            out.flush();
-
+            barrier.await(5, TimeUnit.SECONDS);//等待监听器对消息进行处理.
 		} catch (Exception e) {
 			log.error("", e);
 		} finally {
@@ -127,6 +116,8 @@ public class HttpBaffleThread implements Runnable {
 		}
 		log.debug("End of Thread");
 	}
+
+
 
 	private static HashTree  getReplacementSubTree(JMeterTreeNode selectedNode,TestPlan testPlan,BaffleResultListener listener) {
 		HashTree tree = new ListedHashTree();
