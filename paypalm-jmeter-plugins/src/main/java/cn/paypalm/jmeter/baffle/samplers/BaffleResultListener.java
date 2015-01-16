@@ -54,6 +54,8 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
     private void proxyRequest(){
         String httpBaffleProxyIP= super.getThreadContext().getVariables().get("HttpBaffleProxyIP");
         String httpBaffleProxyPort = super.getThreadContext().getVariables().get("HttpBaffleProxyPort");
+        if (httpBaffleProxyIP == null || httpBaffleProxyIP.isEmpty()) return;
+        if (httpBaffleProxyPort == null || httpBaffleProxyPort.isEmpty()) return;
         try {
             Socket proxySocket = new Socket(httpBaffleProxyIP,Integer.valueOf(httpBaffleProxyPort));
             InputStream proxyInputStream = proxySocket.getInputStream();
