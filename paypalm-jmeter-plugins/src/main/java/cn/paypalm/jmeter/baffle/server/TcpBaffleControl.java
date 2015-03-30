@@ -1,27 +1,33 @@
 package cn.paypalm.jmeter.baffle.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.tree.TreeNode;
+
 import org.apache.jmeter.control.GenericController;
+import org.apache.jmeter.control.ModuleController;
 import org.apache.jmeter.control.NextIsNullException;
-import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
 
+import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.IntegerProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.NullProperty;
 
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 
 import org.apache.log.Logger;
 
-public class TcpBaffleControl extends GenericController implements
-		ReplaceableController {
+public class TcpBaffleControl extends GenericController {
 
 	private static final long serialVersionUID = 233L;
 
 	private transient TcpBaffleServer server;
 
-	public String flag;
 	public String timeout;
 
 	static final int DEFAULT_PORT = 8081;
@@ -31,21 +37,21 @@ public class TcpBaffleControl extends GenericController implements
 	public static final String DEFAULT_PORT_S = Integer.toString(DEFAULT_PORT);
 	public static final String PORT = "TCPMirrorControlGui.port";
 
-	public static final String MAX_POOL_SIZE = "HttpMirrorControlGui.maxPoolSize";
+	public static final String MAX_POOL_SIZE = "TCPMirrorControlGui.maxPoolSize";
 
-	public static final String MAX_QUEUE_SIZE = "HttpMirrorControlGui.maxQueueSize";
+	public static final String MAX_QUEUE_SIZE = "TCPMirrorControlGui.maxQueueSize";
 
 	public static final String TIMEOUT = "TCPMirrorControlGui.timeout";
 	public static final String FLAG = "TCPMirrorControlGui.flag";
 	public static final String INSCRIPT = "TCPMirrorControlGui.inScript";
 	public static final String OUTSCRIPT = "TCPMirrorControlGui.outScript";
-	public static final String FILEPATH = "TCPMirrorControlGui.filePath";
-
+	public static final String JMXPATH = "TCPMirrorControlGui.jmxPath";
+	private static final String NODE_PATH = "TCPMirrorControlGui.node_path";
 	public static final int DEFAULT_MAX_POOL_SIZE = 0;
 
 	public static final int DEFAULT_MAX_QUEUE_SIZE = 25;
 
-	private static final String INCLUDE_PATH = "IncludeController.includepath";
+	private transient JMeterTreeNode selectedNode = null;
 
 	public void setInScript(String inScript) {
 		setProperty(INSCRIPT, inScript);
@@ -63,12 +69,12 @@ public class TcpBaffleControl extends GenericController implements
 		return getPropertyAsString(OUTSCRIPT);
 	}
 
-	public void setFilePath(String filePath) {
-		setProperty(FILEPATH, filePath);
+	public void setJmxPath(String jmxPath) {
+		setProperty(JMXPATH, jmxPath);
 	}
 
-	public String getFilePath() {
-		return getPropertyAsString(FILEPATH);
+	public String getJmxPath() {
+		return getPropertyAsString(JMXPATH);
 	}
 
 	public void setFlag(String flag) {
@@ -163,10 +169,11 @@ public class TcpBaffleControl extends GenericController implements
 		return DEFAULT_PORT;
 	}
 
-	public void startHttpMirror() {
+	public void startTCPMirror() {
 
 		server = new TcpBaffleServer(getPort(), getMaxPoolSize(),
-				getMaxQueueSize(), getFilePath(), flag, timeout);
+				getMaxQueueSize(), getJmxPath(), timeout);
+		server.setSelectedNode(getSelectedNode());
 		server.start();
 		GuiPackage instance = GuiPackage.getInstance();
 		if (instance != null) {
@@ -174,7 +181,7 @@ public class TcpBaffleControl extends GenericController implements
 		}
 	}
 
-	public void stopHttpMirror() {
+	public void stopTCPMirror() {
 		if (server != null) {
 			server.stopServer();
 			GuiPackage instance = GuiPackage.getInstance();
@@ -189,13 +196,6 @@ public class TcpBaffleControl extends GenericController implements
 		}
 	}
 
-	public void setIncludePath(String jmxfile) {
-		this.setProperty(INCLUDE_PATH, jmxfile);
-	}
-
-	public String getIncludePath() {
-		return this.getPropertyAsString(INCLUDE_PATH);
-	}
 
 	@Override
 	public boolean canRemove() {
@@ -209,10 +209,6 @@ public class TcpBaffleControl extends GenericController implements
 	public HashTree getReplacementSubTree() {
 
 		return null;
-	}
-
-	public void resolveReplacementSubTree(JMeterTreeNode context) {
-
 	}
 
 	public Sampler next() {
@@ -239,16 +235,72 @@ public class TcpBaffleControl extends GenericController implements
 
 	@Override
 	public boolean isDone() {
-		// boolean result = true;
-		// try {
-		// result = !evaluateCondition();
-		// } catch (Exception e) {
-		// logger.error(e.getMessage(), e);
-		// }
-		// setDone(true);
-		// return result;
-		// setDone(false);
+
 		return false;
+	}
+
+	public void setSelectedNode(JMeterTreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+		setNodePath();
+	}
+
+	public JMeterTreeNode getSelectedNode() {
+		if (selectedNode == null) {
+			restoreSelected();
+		}
+		return selectedNode;
+	}
+
+	private void restoreSelected() {
+		GuiPackage gp = GuiPackage.getInstance();
+		if (gp != null) {
+			JMeterTreeNode root = (JMeterTreeNode) gp.getTreeModel().getRoot();
+			resolveReplacementSubTree(root);
+		}
+	}
+
+	public void resolveReplacementSubTree(JMeterTreeNode context) {
+		if (selectedNode == null) {
+			List<?> nodePathList = getNodePath();
+			if (nodePathList != null && nodePathList.size() > 0) {
+				traverse(context, nodePathList, 1);
+			}
+		}
+	}
+
+	private void traverse(JMeterTreeNode node, List<?> nodePath, int level) {
+		if (node != null && nodePath.size() > level) {
+			for (int i = 0; i < node.getChildCount(); i++) {
+				JMeterTreeNode cur = (JMeterTreeNode) node.getChildAt(i);
+				if (!(cur.getTestElement() instanceof ModuleController)) {
+					if (cur.getName().equals(nodePath.get(level).toString())) {
+						if (nodePath.size() == (level + 1)) {
+							selectedNode = cur;
+						}
+						traverse(cur, nodePath, level + 1);
+					}
+				}
+			}
+		}
+	}
+
+	private void setNodePath() {
+		List<String> nodePath = new ArrayList<String>();
+		if (selectedNode != null) {
+			TreeNode[] path = selectedNode.getPath();
+			for (TreeNode node : path) {
+				nodePath.add(((JMeterTreeNode) node).getName());
+			}
+		}
+		setProperty(new CollectionProperty(NODE_PATH, nodePath));
+	}
+
+	public List<?> getNodePath() {
+		JMeterProperty prop = getProperty(NODE_PATH);
+		if (!(prop instanceof NullProperty)) {
+			return (List<?>) ((CollectionProperty) prop).getObjectValue();
+		}
+		return null;
 	}
 
 }

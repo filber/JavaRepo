@@ -17,7 +17,7 @@ import org.apache.log.Logger;
 public class BaffleResultListener extends AbstractListenerElement implements SampleListener {
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
-    private static final String ISO_8859_1 = "ISO-8859-1"; //$NON-NLS-1$
+    private static final String ISO_8859_1 = "ISO-8859-1";
     private static final byte[] CRLF = { 0x0d, 0x0a };
 
     private final String requestContent;
@@ -42,11 +42,13 @@ public class BaffleResultListener extends AbstractListenerElement implements Sam
                 outputStream.write(CRLF);
                 outputStream.write(e.getResult().getResponseData());
                 outputStream.flush();
+                barrier.await();
             }
             if ("ProxySampler".equals(e.getResult().getSampleLabel())) {
                 proxyRequest();
+                barrier.await();
             }
-            barrier.await();
+
         } catch (Exception e1) {
             log.error("", e1);
         }

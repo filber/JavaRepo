@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.jmeter.gui.Stoppable;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JOrphanUtils;
 import org.apache.log.Logger;
@@ -29,17 +30,25 @@ public class TcpBaffleServer extends Thread implements Stoppable {
 
 	private int maxQueueSize;
 
-	private String codition;
+	private String jmxPath;
 
-	private String flag;
 	private String timeout;
+	private JMeterTreeNode selectedNode;
 
-	public String getCodition() {
-		return codition;
+	public JMeterTreeNode getSelectedNode() {
+		return selectedNode;
 	}
 
-	public void setCodition(String codition) {
-		this.codition = codition;
+	public void setSelectedNode(JMeterTreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	public String getJmxPath() {
+		return jmxPath;
+	}
+
+	public void setJmxPath(String jmxPath) {
+		this.jmxPath = jmxPath;
 	}
 
 	public TcpBaffleServer(int port) {
@@ -48,29 +57,28 @@ public class TcpBaffleServer extends Thread implements Stoppable {
 	}
 
 	public TcpBaffleServer(int port, int maxThreadPoolSize, int maxQueueSize) {
-		super("HttpMirrorServer");
+		super("TCPMirrorServer");
 		this.daemonPort = port;
 		this.maxThreadPoolSize = maxThreadPoolSize;
 		this.maxQueueSize = maxQueueSize;
 	}
 
 	public TcpBaffleServer(int port, int maxThreadPoolSize, int maxQueueSize,
-			String condition) {
-		super("HttpMirrorServer");
+                           String jmxPath) {
+		super("TCPMirrorServer");
 		this.daemonPort = port;
 		this.maxThreadPoolSize = maxThreadPoolSize;
 		this.maxQueueSize = maxQueueSize;
-		this.codition = condition;
+		this.jmxPath = jmxPath;
 	}
 
 	public TcpBaffleServer(int port, int maxThreadPoolSize, int maxQueueSize,
-			String condition, String flag, String timeout) {
-		super("HttpMirrorServer");
+                           String jmxPath, String timeout) {
+		super("TCPMirrorServer");
 		this.daemonPort = port;
 		this.maxThreadPoolSize = maxThreadPoolSize;
 		this.maxQueueSize = maxQueueSize;
-		this.codition = condition;
-		this.flag = flag;
+		this.jmxPath = jmxPath;
 		this.timeout = timeout;
 	}
 
@@ -89,26 +97,25 @@ public class TcpBaffleServer extends Thread implements Stoppable {
 					.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
 		}
 		try {
-			log.info("Creating HttpMirror ... on port " + daemonPort);
+			log.info("Creating TCPMirror ... on port " + daemonPort);
 			mainSocket = new ServerSocket(daemonPort);
 			mainSocket.setSoTimeout(ACCEPT_TIMEOUT);
-			log.info("HttpMirror up and running!");
+			log.info("TCPMirror up and running!");
 			while (running) {
 				try {
-
+					int i = 0;
 					Socket clientSocket = mainSocket.accept();
-					if (running) {
 
+					if (running) {
+						TcpBaffleThread tcpBaffleThread = new TcpBaffleThread(
+								clientSocket, this.getJmxPath(), timeout);
+						tcpBaffleThread.setSelected(selectedNode);
 						if (threadPoolExecutor != null) {
 
-							threadPoolExecutor.execute(new TcpBaffleThread(
-									clientSocket, this.getCodition(), flag,
-									timeout));
+							threadPoolExecutor.execute(tcpBaffleThread);
 						} else {
 
-							Thread thd = new Thread(new TcpBaffleThread(
-									clientSocket, this.getCodition(), flag,
-									timeout));
+							Thread thd = new Thread(tcpBaffleThread);
 
 							log.debug("Starting new Mirror thread");
 							thd.start();
@@ -121,10 +128,10 @@ public class TcpBaffleServer extends Thread implements Stoppable {
 					log.debug(e.getLocalizedMessage());
 				}
 			}
-			log.info("HttpMirror Server stopped");
+			log.info("TCPMirror Server stopped");
 		} catch (Exception e) {
 			except = e;
-			log.warn("HttpMirror Server stopped", e);
+			log.warn("TCPMirror Server stopped", e);
 		} finally {
 			if (threadPoolExecutor != null) {
 				threadPoolExecutor.shutdownNow();
